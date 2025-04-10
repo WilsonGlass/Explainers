@@ -47,7 +47,7 @@ class MultiLogisticRegressionModel(Model):
         self.num_classes = num_classes
         self.num_features = num_features
         self.weights = np.zeros((num_classes, num_features + 1))
-        self.max_iters = 60000
+        self.max_iters = 10000
         self.train_accuracies = []
         self.eval_accuracies = []
         self.eval_iters = []

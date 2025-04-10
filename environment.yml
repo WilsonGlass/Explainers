@@ -4,6 +4,8 @@ channels:
   - https://repo.anaconda.com/pkgs/main
   - https://repo.anaconda.com/pkgs/r
   - https://repo.anaconda.com/pkgs/msys2
+  - conda-forge
+  - pytorch
 dependencies:
   - blas=1.0
   - bottleneck=1.4.2
@@ -78,10 +80,10 @@ dependencies:
   - pyparsing=3.2.0
   - pyqt=6.7.1
   - pyqt6-sip=13.9.1
-  - python=3.11.11
+  - python=3.10
   - python-dateutil=2.9.0post0
   - python-tzdata=2023.3
-  - pytorch=2.5.1
+  - pytorch=2.0.1
   - pytz=2024.1
   - qtbase=6.7.3
   - qtdeclarative=6.7.3
@@ -99,7 +101,7 @@ dependencies:
   - tbb=2021.8.0
   - threadpoolctl=3.5.0
   - tk=8.6.14
-  - torchaudio=2.5.1
+  - torchaudio=2.0.1
   - tornado=6.4.2
   - typing_extensions=4.12.2
   - tzdata=2025a
