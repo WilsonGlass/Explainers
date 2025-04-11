@@ -105,7 +105,6 @@ class MultiLogisticRegressionModel(Model):
                 self.eval_iters.append(i + 1)
 
 
-# PA4 Q6
 def multi_classification():
     train_data = util.get_dataset("mnist_train")
     test_data = util.get_dataset("mnist_test")
@@ -117,18 +116,14 @@ def multi_classification():
     )
     model.train(train_data, evalset=test_data)
 
-    print("[Q6] Plotting training accuracy curve:")
     train_data.plot_accuracy_curve(
         model.eval_iters,
         model.train_accuracies,
         title="Training Accuracy (Multi-class)"
     )
 
-    print("[Q6] Plotting confusion matrix on the test set:")
     test_data.plot_confusion_matrix(model, step=10, show_diagonal=False)
 
-    # Plot learned weights for each digit (0..9)
-    print("[Q6] Visualizing each digit's learned weights (no bias).")
     for k in range(model.num_classes):
         w_no_bias = model.weights[k][1:]
         w_image = w_no_bias.reshape((28, 28))
@@ -141,6 +136,7 @@ def multi_classification():
 
 def main():
     multi_classification()
+
 
 if __name__ == "__main__":
     main()
