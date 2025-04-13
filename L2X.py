@@ -8,8 +8,7 @@ from IPython.display import display
 from omnixai.data.image import Image
 from omnixai.explainers.vision import L2XImage
 
-import torch
-import torch.nn as nn
+from torch import nn
 
 
 def custom_cross_entropy_loss(input, target):
