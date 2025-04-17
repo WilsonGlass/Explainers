@@ -39,7 +39,7 @@ to each input feature by estimating its marginal contribution to the model’s o
     ```bash
    jupyter lab ecex.ipynb
 
-----
+---
    
 ## Citations
 - Chen, J., Song, L., Wainwright, M. J., & Jordan, M. I. (2018). **Learning to Explain: An Information‐Theoretic Perspective on Model Interpretation.** *Proceedings of the 35th International Conference on Machine Learning* (ICML). arXiv:1802.07814
