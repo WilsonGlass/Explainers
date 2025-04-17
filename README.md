@@ -1,6 +1,6 @@
 # MNIST Explainability Demo
 
-This repository demonstrates instance‐wise explanations on MNIST digits using two methods:
+This repository showcases two different explanation techniques applied to MNIST digit classification:
 
 1. **L2X:** An explainer which measures mutual information between features and the model’s output, helping to 
 identify the most important subset of input features (e.g., pixels) that retain the predictive power of the original input.
@@ -23,8 +23,8 @@ to each input feature by estimating its marginal contribution to the model’s o
 
 1. **Clone the repo**  
    ```bash
-   git clone https://github.com/<your‑user>/mnist-explainability.git
-   cd mnist-explainability
+   git clone https://github.com/WilsonGlass/Explainers.git
+   cd Explainers
 
 2. **Decompress MNIST training data**
     ```bash
@@ -38,6 +38,8 @@ to each input feature by estimating its marginal contribution to the model’s o
 4. **Run**
     ```bash
    jupyter lab ecex.ipynb
+
+----
    
 ## Citations
 - Chen, J., Song, L., Wainwright, M. J., & Jordan, M. I. (2018). **Learning to Explain: An Information‐Theoretic Perspective on Model Interpretation.** *Proceedings of the 35th International Conference on Machine Learning* (ICML). arXiv:1802.07814
