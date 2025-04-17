@@ -1,67 +1,68 @@
-import os
+#!/usr/bin/env python3
+"""
+SHAP magnitude overlay — single‑hue green transparency.
+"""
+import os, numpy as np, shap
+import matplotlib.pyplot as plt
+from PIL import Image as PILImage
 
-import numpy as np
-import shap
 import util
 from model import MultiLogisticRegressionModel
-from PIL import Image as PILImage
-import matplotlib.pyplot as plt
-
-train_data = util.get_dataset("mnist_train")
-test_data = util.get_dataset("mnist_test")
-train_arrays = np.array(train_data.xs).reshape(-1, 28*28).astype(float)
-test_arrays = np.array(test_data.xs).reshape(-1, 28*28).astype(float)
 
 
-def model_predict_prob(X):
-    # Reshape the flattened input (N,784) to (N,28,28)
-    images = X.reshape(-1, 28, 28)
-    return np.array([model.hypothesis(x) for x in images])
+# 1.  Train a very small logistic model on MNIST
+train_ds  = util.get_dataset("mnist_train")
+X_train   = np.array(train_ds.xs).reshape(-1, 28 * 28).astype(float)
+
+model = MultiLogisticRegressionModel(28 * 28, 10, learning_rate=1e-2)
+model.train(train_ds)
 
 
+def predict(flat_imgs: np.ndarray) -> np.ndarray:
+    imgs = flat_imgs.reshape(-1, 28, 28)
+    return np.array([model.hypothesis(img) for img in imgs])
 
-num_features = 28 * 28
-num_classes = 10
-learning_rate = 1e-2
 
-model = MultiLogisticRegressionModel(
-    num_features=num_features,
-    num_classes=num_classes,
-    learning_rate=learning_rate
-)
-model.train(train_data, evalset=test_data)
+# 2.  SHAP explainer with a tiny background
+bg = X_train[np.random.choice(len(X_train), 100, replace=False)]
+explainer = shap.Explainer(predict, bg)
 
-background_size = 100
-bg_indices = np.random.choice(train_arrays.shape[0], background_size, replace=False)
-background = train_arrays[bg_indices]
-e = shap.KernelExplainer(model_predict_prob, background)
 
-explained_imgs = []
-for i in range(10):
-    file_path = os.path.join("mnist_png", "explained_imgs", f"{i}.png")
-    img = PILImage.open(file_path).convert('L')
-    img_array = np.array(img).astype(float) / 255.0
-    explained_imgs.append(img_array)
+# 3.  Load ten custom images we want to explain
+def load_gray(path: str) -> np.ndarray:
+    return np.array(PILImage.open(path).convert('L')).astype(float) / 255.0
 
-explained_imgs = np.array(explained_imgs)
-explained_imgs_flat = explained_imgs.reshape((10, 28*28))
-shap_values = e.shap_values(explained_imgs_flat)
-explained_imgs_4d = explained_imgs.reshape((10, 28, 28, 1))
+imgs = np.stack([
+    load_gray(os.path.join("mnist_png", "explained_imgs", f"{i}.png"))
+    for i in range(10)
+])                                # (10,28,28)
+flat_imgs = imgs.reshape(10, -1)
 
-pred_probs = model_predict_prob(explained_imgs_flat)
-pred_labels = np.argmax(pred_probs, axis=1)
 
-svals_perimage = []
-for i in range(len(pred_labels)):
-    p = pred_labels[i]
-    svals_perimage.append(shap_values[p][i])
+# 4.  Explain once
+exp       = explainer(flat_imgs, max_evals=2000)
+probs     = predict(flat_imgs)
+pred_cls  = np.argmax(probs, axis=1)
 
-svals_perimage = np.array(svals_perimage)
-svals_perimage = svals_perimage.reshape((10, 28, 28, 1))
+
+# 6.  Plot originals vs green‑magnitude overlays
+fig, ax = plt.subplots(10, 2, figsize=(6, 55))
+fig.subplots_adjust(hspace=1.0)
 
 for i in range(10):
-    plt.figure()
-    plt.title(f"Image {i} - Predicted class = {pred_labels[i]}")
-    plt.imshow(svals_perimage[i, :, :, 0], cmap="RdBu")
-    plt.colorbar()
-    plt.show()
+    imp_map = np.abs(exp.values[i, :, pred_cls[i]]).reshape(28, 28)
+
+    # left: original
+    ax[i, 0].imshow(imgs[i], cmap='gray')
+    ax[i, 0].set_title(f"Digit {i}", fontsize=12)
+    ax[i, 0].axis('off')
+
+    # right: overlay
+    ax[i, 1].imshow(imp_map)
+    ax[i, 1].set_title(
+        f"Pred {pred_cls[i]}  •  Conf {probs[i, pred_cls[i]]:.2f}", fontsize=12
+    )
+    ax[i, 1].axis('off')
+
+plt.tight_layout()
+plt.show()

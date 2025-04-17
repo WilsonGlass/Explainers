@@ -15,6 +15,19 @@ def custom_cross_entropy_loss(input, target):
     target = target.long()
     return nn.CrossEntropyLoss()(input, target)
 
+def multi_logistic_predict_function(images):
+    """
+    images: a list (or array) of omnixai.data.image.Image
+    returns: a numpy array of shape [N, 10], each row is a softmax probability distribution
+    """
+    preds = []
+    for im in images:
+        # Convert image to numpy array with shape (28, 28)
+        x_2d = im.to_numpy().astype(float)
+        probs = model.hypothesis(x_2d)
+        preds.append(probs)
+    return np.array(preds)
+
 
 train_data = util.get_dataset("mnist_train")
 test_data = util.get_dataset("mnist_test")
@@ -38,19 +51,6 @@ model = MultiLogisticRegressionModel(
     learning_rate=learning_rate
 )
 model.train(train_data, evalset=test_data)
-
-def multi_logistic_predict_function(images):
-    """
-    images: a list (or array) of omnixai.data.image.Image
-    returns: a numpy array of shape [N, 10], each row is a softmax probability distribution
-    """
-    preds = []
-    for im in images:
-        # Convert image to numpy array with shape (28, 28)
-        x_2d = im.to_numpy().astype(float)
-        probs = model.hypothesis(x_2d)
-        preds.append(probs)
-    return np.array(preds)
 
 explainer = L2XImage(
     training_data=train_imgs,
